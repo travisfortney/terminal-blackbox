@@ -45,6 +45,11 @@ steps=(
 
 wifi_name() {
   local wifi_device wifi_raw wifi_summary wifi_ssid
+  if [ -n "${BLACKBOX_WIFI_NAME:-}" ]; then
+    echo "$BLACKBOX_WIFI_NAME"
+    return
+  fi
+
   wifi_device="$(networksetup -listallhardwareports 2>/dev/null | awk '/Hardware Port: Wi-Fi/{getline; sub(/^Device: /,""); print; exit}')"
   if [ -z "$wifi_device" ]; then
     echo "unknown"
