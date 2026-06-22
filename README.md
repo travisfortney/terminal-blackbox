@@ -2,7 +2,7 @@
 
 A fake terminal boot sequence for making your shell look briefly more dramatic than it has any right to be.
 
-It does not hack anything. It does not scan anything. It is just a theatrical terminal toy with some green-screen nonsense, a few fake failures, and enough red text to feel like a tiny mainframe had a bad afternoon.
+It does not hack anything. It does not scan anything. It just prints harmless green-screen nonsense, fake failures, and enough red text to make a tiny mainframe look like it had a bad afternoon.
 
 ## Install
 
@@ -13,7 +13,7 @@ It does not hack anything. It does not scan anything. It is just a theatrical te
 Optional shell alias:
 
 ```bash
-alias hack="$PWD/bin/blackbox"
+alias hack="/path/to/terminal-blackbox/bin/blackbox"
 ```
 
 ## Options
@@ -27,3 +27,5 @@ alias hack="$PWD/bin/blackbox"
 ## Safety
 
 This is local output only. It prints fake status lines and reads harmless local context like current path, shell, Wi-Fi name, and uptime.
+
+If this fools someone into thinking it is real, please take their keyboard away gently.
