@@ -1,20 +1,24 @@
 # Terminal Blackbox
 
-A fake terminal boot sequence for making your shell look briefly more dramatic than it has any right to be.
+A fake terminal boot sequence for harmless green-screen drama.
 
-It does not hack anything. It does not scan anything. It just prints harmless green-screen nonsense, fake failures, and enough red text to make a tiny mainframe look like it had a bad afternoon.
+This started as a tiny demo for showing someone how much personality a shell script can have without doing anything important, dangerous, or remotely useful in a corporate compliance sense.
 
-## Install
+It does not hack anything. It does not scan anything. It does not phone home. It just prints local terminal nonsense, fake failures, and enough red text to make your laptop look like it briefly considered joining a movie from 1998.
+
+## Run
 
 ```bash
 ./bin/blackbox
 ```
 
-Optional shell alias:
+Optional alias, if you want the drama on demand:
 
 ```bash
 alias hack="/path/to/terminal-blackbox/bin/blackbox"
 ```
+
+Yes, the alias is ridiculous. That is mostly the point.
 
 ## Options
 
@@ -24,8 +28,24 @@ alias hack="/path/to/terminal-blackbox/bin/blackbox"
 ./bin/blackbox --self-test
 ```
 
+## What It Actually Does
+
+It prints a fake boot sequence using harmless local context, like:
+
+- current path
+- shell
+- terminal type
+- Wi-Fi name
+- uptime
+
+That is it. No network probing, no credential access, no background service, no spooky nonsense pretending to be security research.
+
+## Why
+
+Because sometimes a terminal should look like it is doing something deeply serious, even when it is mostly just wearing sunglasses indoors.
+
 ## Safety
 
-This is local output only. It prints fake status lines and reads harmless local context like current path, shell, Wi-Fi name, and uptime.
+This is local output only.
 
-If this fools someone into thinking it is real, please take their keyboard away gently.
+If this fools someone into thinking it is real, please take their keyboard away gently and offer them water.

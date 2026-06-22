@@ -3,6 +3,7 @@ set -u
 
 DELAY="0.01045"
 ANIMATE=1
+OPERATOR_NAME="${USER:-unknown}"
 
 for arg in "$@"; do
   case "$arg" in
@@ -77,7 +78,7 @@ progress_bar() {
 }
 
 printf "\033[2J\033[H"
-printf "\033[1;32mBLACKBOX/2.7\033[0m  %s  Travis Fortney\n" "$(date '+%m/%d/%y %H:%M:%S')"
+printf "\033[1;32mBLACKBOX/2.7\033[0m  %s  %s\n" "$(date '+%m/%d/%y %H:%M:%S')" "$OPERATOR_NAME"
 printf "\033[2m---------------------------------------------------------------\033[0m\n"
 printf " carrier: local               term: %s\n" "${TERM:-unknown}"
 printf " shell:   %s\n" "${SHELL:-unknown}"
@@ -108,7 +109,7 @@ done
 
 uptime_short="$(uptime | sed 's/^ //; s/, [0-9][0-9]* users.*//; s/load averages.*//')"
 printf "\n\033[1;32mSESSION OPEN\033[0m\n"
-printf " user     Travis Fortney\n"
+printf " user     %s\n" "$OPERATOR_NAME"
 printf " path     %s\n" "$PWD"
 printf " wifi     %s\n" "$(wifi_name)"
 printf " \033[1;38;2;255;68;68muptime   %s\033[0m\n" "$uptime_short"
