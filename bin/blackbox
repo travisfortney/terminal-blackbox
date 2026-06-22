@@ -44,7 +44,7 @@ steps=(
 )
 
 wifi_name() {
-  local wifi_device wifi_raw
+  local wifi_device wifi_raw wifi_summary wifi_ssid
   wifi_device="$(networksetup -listallhardwareports 2>/dev/null | awk '/Hardware Port: Wi-Fi/{getline; sub(/^Device: /,""); print; exit}')"
   if [ -z "$wifi_device" ]; then
     echo "unknown"
@@ -52,11 +52,25 @@ wifi_name() {
   fi
   wifi_raw="$(networksetup -getairportnetwork "$wifi_device" 2>/dev/null)"
   case "$wifi_raw" in
-    "Current Wi-Fi Network: "*) echo "${wifi_raw#Current Wi-Fi Network: }" ;;
-    *"not associated with an AirPort network"*) echo "disconnected" ;;
-    "") echo "unknown" ;;
-    *) echo "$wifi_raw" ;;
+    "Current Wi-Fi Network: "*) echo "${wifi_raw#Current Wi-Fi Network: }"; return ;;
+    *"not associated with an AirPort network"*) ;;
+    "") ;;
+    *) echo "$wifi_raw"; return ;;
   esac
+
+  wifi_summary="$(ipconfig getsummary "$wifi_device" 2>/dev/null || true)"
+  wifi_ssid="$(printf "%s\n" "$wifi_summary" | awk -F ' : ' '/^[[:space:]]*SSID[[:space:]]:/ {print $2; exit}')"
+  if [ -n "$wifi_ssid" ]; then
+    echo "$wifi_ssid"
+    return
+  fi
+
+  if printf "%s\n" "$wifi_summary" | grep -q 'LinkStatusActive : TRUE'; then
+    echo "connected"
+    return
+  fi
+
+  echo "disconnected"
 }
 
 progress_bar() {
