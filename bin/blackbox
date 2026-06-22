@@ -1,0 +1,115 @@
+#!/bin/bash
+set -u
+
+DELAY="0.01045"
+ANIMATE=1
+
+for arg in "$@"; do
+  case "$arg" in
+    --fast) DELAY="0.004" ;;
+    --no-animation) ANIMATE=0 ;;
+    --self-test) bash -n "$0" && echo "self-test passed"; exit 0 ;;
+    -h|--help)
+      echo "Usage: blackbox [--fast] [--no-animation] [--self-test]"
+      exit 0
+      ;;
+    *) echo "Unknown option: $arg" >&2; exit 64 ;;
+  esac
+done
+
+steps=(
+  "tty probe|binding local session|ok"
+  "port map|reading listener table|ok"
+  "ghostnet|sniffing abandoned packets|timeout"
+  "uid check|resolving operator|ok"
+  "runtime|checking node path|ok"
+  "red pill|rejecting blue pill fallback|awakened"
+  "packet|sampling local route|ok"
+  "repo|reading branch state|ok"
+  "darkweb|checking villain registry|blocked"
+  "origin|reading remote alias|ok"
+  "github|resolving octocat signal|ok"
+  "daemon|checking background noise|ok"
+  "brew|preferring arm64 toolchain|ok"
+  "skynet|requesting ethics override|fail"
+  "mainframe|probing ghost route|denied"
+  "focus|muting notification fog|ok"
+  "payload|loading terminal overlay|ok"
+  "cipher|rotating display seed|ok"
+  "red queen|opening control channel|locked"
+  "entropy|stirring green noise|ok"
+  "handshake|opening local channel|ok"
+  "flux_capacitor|charging temporal buffer|unstable"
+)
+
+wifi_name() {
+  local wifi_device wifi_raw
+  wifi_device="$(networksetup -listallhardwareports 2>/dev/null | awk '/Hardware Port: Wi-Fi/{getline; sub(/^Device: /,""); print; exit}')"
+  if [ -z "$wifi_device" ]; then
+    echo "unknown"
+    return
+  fi
+  wifi_raw="$(networksetup -getairportnetwork "$wifi_device" 2>/dev/null)"
+  case "$wifi_raw" in
+    "Current Wi-Fi Network: "*) echo "${wifi_raw#Current Wi-Fi Network: }" ;;
+    *"not associated with an AirPort network"*) echo "disconnected" ;;
+    "") echo "unknown" ;;
+    *) echo "$wifi_raw" ;;
+  esac
+}
+
+progress_bar() {
+  local label="$1" text="$2" fill_color="$3" bar
+  if [ "$ANIMATE" -eq 0 ]; then
+    printf "  %-14s [${fill_color}##########\033[0m] %s" "$label" "$text"
+    return
+  fi
+  printf "  %-14s [..........] %s" "$label" "$text"
+  for bar in 1 2 3 4 5 6 7 8 9 10; do
+    sleep "$DELAY"
+    printf "\r  %-14s [" "$label"
+    printf "%0.s${fill_color}#\033[0m" $(seq 1 "$bar")
+    if [ "$bar" -lt 10 ]; then
+      printf "%0.s." $(seq 1 $((10 - bar)))
+    fi
+    printf "] %s" "$text"
+  done
+}
+
+printf "\033[2J\033[H"
+printf "\033[1;32mBLACKBOX/2.7\033[0m  %s  Travis Fortney\n" "$(date '+%m/%d/%y %H:%M:%S')"
+printf "\033[2m---------------------------------------------------------------\033[0m\n"
+printf " carrier: local               term: %s\n" "${TERM:-unknown}"
+printf " shell:   %s\n" "${SHELL:-unknown}"
+printf " cwd:     %s\n" "$PWD"
+printf "\033[2m---------------------------------------------------------------\033[0m\n\n"
+
+printf "\033[1;32mBOOTSTRAP\033[0m  "
+for bar in 1 2 3 4 5 6 7 8 9 10; do
+  printf "\033[32m#\033[0m"
+  [ "$ANIMATE" -eq 0 ] || sleep "$DELAY"
+done
+printf " \033[1;32mREADY\033[0m\n\n"
+
+for step in "${steps[@]}"; do
+  IFS='|' read -r label text result <<< "$step"
+  [ -n "$result" ] || result="ok"
+  fill_color="\033[32m"
+  status_color="\033[1;32m"
+  case "$result" in
+    fail|denied|locked|unstable|timeout|blocked|awakened)
+      fill_color="\033[38;2;255;68;68m"
+      status_color="\033[1;38;2;255;68;68m"
+      ;;
+  esac
+  progress_bar "$label" "$text" "$fill_color"
+  printf "  ${status_color}%s\033[0m\n" "$result"
+done
+
+uptime_short="$(uptime | sed 's/^ //; s/, [0-9][0-9]* users.*//; s/load averages.*//')"
+printf "\n\033[1;32mSESSION OPEN\033[0m\n"
+printf " user     Travis Fortney\n"
+printf " path     %s\n" "$PWD"
+printf " wifi     %s\n" "$(wifi_name)"
+printf " \033[1;38;2;255;68;68muptime   %s\033[0m\n" "$uptime_short"
+printf " status   green / session clean\n"
